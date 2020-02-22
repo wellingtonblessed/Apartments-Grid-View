@@ -15,5 +15,6 @@ export const ListContainer = styled.div`
 
 export const ListItemWrapper = styled.div`
   max-width: 390px;
+  margin-bottom: 30px;
   position: relative;
 `;

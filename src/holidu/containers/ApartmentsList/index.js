@@ -6,6 +6,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import { getApartmentsAction } from "../../store/modules/apartments";
 import ListItem from "../../components/ListItem";
+import PreviewModal from "../../components/PreviewModal";
 import Loader from "../../components/Loader";
 import { ListContainer, ListItemWrapper } from "./styles";
 
@@ -14,6 +15,7 @@ const ApartmentList = ({
   apartments,
   loading,
   error,
+  preview,
   nextPage,
   totalCount
 }) => {
@@ -28,54 +30,56 @@ const ApartmentList = ({
   }, [apartments, totalCount]);
 
   const pageIndex = () => {
-    const urlParams = new URLSearchParams(nextPage);
-    return urlParams.getAll("pageIndex")[0];
+    if (nextPage) {
+      const urlParams = new URLSearchParams(nextPage);
+      return urlParams.getAll("pageIndex")[0];
+    }
+    return 0;
   };
 
   const handleLoadMore = () => getApartments(pageIndex());
 
-  if ((loading || error) && pageIndex < 1) return <Loader error={error} />;
+  if ((loading || error) && pageIndex() === 0) return <Loader error={error} />;
 
   return (
-    <ListContainer>
-      <InfiniteScroll
-        dataLength={apartments.length}
-        next={handleLoadMore}
-        hasMore={hasMore}
-        loader={<Loader error={error} />}
-      >
-        {apartments
-          ? apartments.map(
-              ({
-                id,
-                isAvailable,
-                isExpressBookable,
-                isInstantBookable,
-                price: { daily: price },
-                rating,
-                details,
-                photos
-              }) => {
-                const props = {
+    <>
+      <ListContainer>
+        <InfiniteScroll
+          dataLength={apartments.length}
+          next={handleLoadMore}
+          hasMore={hasMore}
+          loader={<Loader error={error} />}
+        >
+          {apartments
+            ? apartments.map(
+                ({
                   id,
-                  isAvailable,
-                  isExpressBookable,
                   isInstantBookable,
-                  price,
+                  price: { daily: price },
                   rating,
                   details,
                   photos
-                };
-                return (
-                  <ListItemWrapper key={id}>
-                    <ListItem {...props} />
-                  </ListItemWrapper>
-                );
-              }
-            )
-          : null}
-      </InfiniteScroll>
-    </ListContainer>
+                }) => {
+                  const props = {
+                    id,
+                    isInstantBookable,
+                    price,
+                    rating,
+                    details,
+                    photos
+                  };
+                  return (
+                    <ListItemWrapper key={id}>
+                      <ListItem {...props} />
+                    </ListItemWrapper>
+                  );
+                }
+              )
+            : null}
+        </InfiniteScroll>
+      </ListContainer>
+      {preview ? <PreviewModal /> : null}
+    </>
   );
 };
 
@@ -83,6 +87,7 @@ const mapStateToProps = ({ apartments: apartmentItems, session }) => ({
   apartments: get(apartmentItems, "offers", []),
   loading: get(session, "loading", false),
   error: get(session, "error", false),
+  preview: get(session, "preview", false),
   nextPage: get(apartmentItems, "metaData.cursor.nextPage"),
   totalCount: get(apartmentItems, "metaData.cursor.totalCount")
 });

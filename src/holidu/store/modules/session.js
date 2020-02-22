@@ -1,6 +1,8 @@
 // TYPES
 export const SET_LOADING = "SET_LOADING";
 export const SET_ERROR_STATUS = "SET_ERROR_STATUS";
+export const OPEN_PREVIEW = "OPEN_PREVIEW";
+export const CLOSE_PREVIEW = "CLOSE_PREVIEW";
 
 // ACTIONS
 export const setLoadingAction = loadingState => ({
@@ -13,8 +15,16 @@ export const setErrorAction = errorState => ({
   errorState
 });
 
+export const openPreviewAction = () => ({
+  type: OPEN_PREVIEW
+});
+
+export const closePreviewAction = () => ({
+  type: CLOSE_PREVIEW
+});
+
 // REDUCER
-const defaultState = { loading: false, error: false };
+const defaultState = { loading: false, error: false, preview: false };
 
 const session = (state = defaultState, action) => {
   switch (action.type) {
@@ -27,6 +37,16 @@ const session = (state = defaultState, action) => {
       return {
         ...state,
         error: action.errorState
+      };
+    case OPEN_PREVIEW:
+      return {
+        ...state,
+        preview: true
+      };
+    case CLOSE_PREVIEW:
+      return {
+        ...state,
+        preview: false
       };
     default:
       return state;

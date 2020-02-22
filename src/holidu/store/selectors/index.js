@@ -4,6 +4,7 @@ import find from "lodash/find";
 
 export const selectedApartmentSelector = ({ apartments }) =>
   get(apartments, "selected");
+
 export const apartmentsSelector = ({ apartments }) =>
   get(apartments, "offers", []);
 
